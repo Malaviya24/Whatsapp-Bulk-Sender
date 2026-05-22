@@ -1,0 +1,44 @@
+{
+  "name": "bulksender",
+  "version": "2.0.0",
+  "description": "Free, open-source WhatsApp bulk message sender with anti-ban protection, media support, and real-time delivery tracking",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "whatsapp",
+    "bulk-sender",
+    "bulk-messaging",
+    "whatsapp-web",
+    "whatsapp-automation",
+    "anti-ban",
+    "marketing",
+    "open-source",
+    "free",
+    "desktop-app"
+  ],
+  "author": "Malaviya24",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Malaviya24/Whatsapp-Bulk-Sender.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Malaviya24/Whatsapp-Bulk-Sender/issues"
+  },
+  "homepage": "https://github.com/Malaviya24/Whatsapp-Bulk-Sender#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
+    "qrcode": "^1.5.4",
+    "systray": "^1.0.5",
+    "whatsapp-web.js": "^1.26.0",
+    "xlsx": "^0.18.5"
+  }
+}

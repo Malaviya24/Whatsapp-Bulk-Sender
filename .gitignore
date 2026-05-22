@@ -1,0 +1,37 @@
+# Dependencies (auto-installed by install.bat or npm install)
+node_modules/
+
+# WhatsApp session and cache (PRIVATE - never commit)
+.wwebjs_auth/
+.wwebjs_cache/
+
+# User data (private to each user)
+uploads/
+history.json
+logs.txt
+
+# Build artifacts
+BulkSender-Share.zip
+BulkSender-Share/
+*.log
+
+# Environment files (use .env.example instead)
+.env
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.settings/
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*~
