@@ -9,6 +9,7 @@
 A professional desktop application for sending bulk WhatsApp messages with anti-ban protection, media support, and real-time delivery tracking.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Malaviya24/Whatsapp-Bulk-Sender?include_prereleases&label=release)](https://github.com/Malaviya24/Whatsapp-Bulk-Sender/releases/latest)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](#)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
@@ -69,7 +70,7 @@ Most WhatsApp bulk senders are either expensive paid tools, fragile Python scrip
 
 ### Option 1: One-Click Install (Recommended)
 
-1. **Download** the latest release ZIP from the [Releases](../../releases) page (or download this repo as ZIP)
+1. **Download** the latest release ZIP from the [Latest Release](https://github.com/Malaviya24/Whatsapp-Bulk-Sender/releases/latest) page (or download this repo as ZIP)
 2. **Extract** the ZIP to any folder (e.g., `C:\BulkSender`)
 3. **Double-click** `install.bat`
 4. Wait while it auto-installs everything (Node.js if needed, packages, shortcuts)
