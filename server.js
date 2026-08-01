@@ -267,7 +267,75 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function isCommsNotReadyError(err) {
+    const message = err && err.message ? err.message : String(err || '');
+    return /sendIq called before startComms|Comms::sendIq/i.test(message);
+}
+
+async function waitForWhatsAppComms(timeoutMs = 15000) {
+    const startedAt = Date.now();
+
+    while (Date.now() - startedAt < timeoutMs) {
+        if (!waClient || !waReady) {
+            await sleep(500);
+            continue;
+        }
+
+        try {
+            const state = await waClient.getState();
+            if (state === 'CONNECTED') {
+                await sleep(1000);
+                return true;
+            }
+        } catch (e) {
+            if (!isCommsNotReadyError(e)) {
+                console.log('[WA] State check warning:', e.message || e);
+            }
+        }
+
+        await sleep(500);
+    }
+
+    return waReady;
+}
+
+async function canSendToRecipient(chatId) {
+    try {
+        const isRegistered = await waClient.isRegisteredUser(chatId);
+        return { ok: isRegistered, error: isRegistered ? '' : 'Number not registered on WhatsApp' };
+    } catch (err) {
+        if (isCommsNotReadyError(err)) {
+            console.log(`[WA] Registration check not ready for ${chatId}; trying direct send.`);
+            return { ok: true, error: '' };
+        }
+
+        throw err;
+    }
+}
+
 // ─── Send Messages ───
+async function sendWhatsAppMessage(chatId, text, media) {
+    try {
+        if (media) {
+            return await waClient.sendMessage(chatId, media, { caption: text });
+        }
+        return await waClient.sendMessage(chatId, text);
+    } catch (err) {
+        if (!isCommsNotReadyError(err)) {
+            throw err;
+        }
+
+        console.log(`[WA] Send channel not ready for ${chatId}; retrying once.`);
+        await waitForWhatsAppComms(10000);
+        await sleep(3000);
+
+        if (media) {
+            return await waClient.sendMessage(chatId, media, { caption: text });
+        }
+        return await waClient.sendMessage(chatId, text);
+    }
+}
+
 async function sendBulkMessages(numbers, message, mediaPath, options) {
     const { delayMin, delayMax, batchSize, batchCooldown } = options;
 
@@ -279,6 +347,7 @@ async function sendBulkMessages(numbers, message, mediaPath, options) {
     cancelRequested = false;
 
     const batchId = new Date().toISOString().replace(/[:.]/g, '-');
+    await waitForWhatsAppComms();
 
     let media = null;
     if (mediaPath && fs.existsSync(mediaPath)) {
@@ -301,7 +370,7 @@ async function sendBulkMessages(numbers, message, mediaPath, options) {
 
         const log = {
             number: '+' + formatted,
-            message: message.length > 80 ? message.slice(0, 80) + '...' : message,
+            message: message && message.length > 80 ? message.slice(0, 80) + '...' : message,
             fullMessage: message,
             status: 'sending',
             deliveryStatus: 'pending',
@@ -314,20 +383,15 @@ async function sendBulkMessages(numbers, message, mediaPath, options) {
 
         try {
             // Check if number is registered on WhatsApp
-            const isRegistered = await waClient.isRegisteredUser(chatId);
-            if (!isRegistered) {
-                throw new Error('Number not registered on WhatsApp');
+            const recipient = await canSendToRecipient(chatId);
+            if (!recipient.ok) {
+                throw new Error(recipient.error);
             }
 
             // Process spin syntax for each message
-            const processedMsg = processSpinSyntax(message);
+            const processedMsg = processSpinSyntax(message || '');
 
-            let sentMsg;
-            if (media) {
-                sentMsg = await waClient.sendMessage(chatId, media, { caption: processedMsg });
-            } else {
-                sentMsg = await waClient.sendMessage(chatId, processedMsg);
-            }
+            const sentMsg = await sendWhatsAppMessage(chatId, processedMsg, media);
 
             log.status = 'sent';
             log.deliveryStatus = 'sent';
