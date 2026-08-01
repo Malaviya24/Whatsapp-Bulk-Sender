@@ -13,6 +13,8 @@ logs.txt
 # Build artifacts
 BulkSender-Share.zip
 BulkSender-Share/
+dist/
+.puppeteer-cache/
 *.log
 
 # Environment files (use .env.example instead)

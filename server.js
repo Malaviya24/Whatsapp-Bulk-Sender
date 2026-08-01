@@ -12,18 +12,31 @@ const xlsx = require('xlsx');
 const { exec } = require('child_process');
 
 const app = express();
+const APP_ROOT = __dirname;
+const DATA_DIR = process.env.BULKSENDER_DATA_DIR || APP_ROOT;
+const PUBLIC_DIR = path.join(APP_ROOT, 'public');
+const ASSETS_DIR = path.join(APP_ROOT, 'assets');
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+const dataEnvPath = path.join(DATA_DIR, '.env');
+if (fs.existsSync(dataEnvPath)) {
+    require('dotenv').config({ path: dataEnvPath, override: true });
+}
+
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({ createParentPath: true, useTempFiles: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(PUBLIC_DIR));
 
 // Folders
-const UPLOAD_DIR = path.join(__dirname, 'uploads');
-const HISTORY_FILE = path.join(__dirname, 'history.json');
-const SESSION_DIR = path.join(__dirname, '.wwebjs_auth');
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
+const HISTORY_FILE = path.join(DATA_DIR, 'history.json');
+const SESSION_DIR = path.join(DATA_DIR, '.wwebjs_auth');
+const CACHE_DIR = path.join(DATA_DIR, '.wwebjs_cache');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 // State
@@ -110,7 +123,7 @@ function initWhatsApp() {
         puppeteer: puppeteerOptions,
         webVersionCache: {
             type: 'local',
-            path: path.join(__dirname, '.wwebjs_cache'),
+            path: CACHE_DIR,
         },
     });
 
@@ -507,7 +520,7 @@ DELAY_MAX=${data.delayMax || 12}
 BATCH_SIZE=${data.batchSize || 0}
 BATCH_COOLDOWN=${data.batchCooldown || 60}
 `;
-    fs.writeFileSync(path.join(__dirname, '.env'), envContent);
+    fs.writeFileSync(dataEnvPath, envContent);
     res.json({ success: true, message: 'Settings saved! Restart app to apply.' });
 });
 
@@ -539,7 +552,7 @@ function setupSystemTray() {
         return;
     }
 
-    const iconPath = path.join(__dirname, 'assets', 'icon.ico');
+    const iconPath = path.join(ASSETS_DIR, 'icon.ico');
     let icon = '';
     try {
         if (fs.existsSync(iconPath)) {
@@ -601,8 +614,10 @@ app.listen(PORT, () => {
     console.log(`  Open: http://localhost:${PORT}`);
     console.log('='.repeat(50) + '\n');
 
-    // Setup system tray icon
-    try { setupSystemTray(); } catch (e) { console.log('[*] Tray setup skipped'); }
+    // Setup system tray icon for script/browser mode. Electron handles its own tray.
+    if (process.env.BULKSENDER_DESKTOP !== 'true') {
+        try { setupSystemTray(); } catch (e) { console.log('[*] Tray setup skipped'); }
+    }
 
     // Auto-initialize ONLY if there's an existing session (faster auto-login)
     if (fs.existsSync(SESSION_DIR) && fs.readdirSync(SESSION_DIR).length > 0) {

@@ -2,10 +2,14 @@
   "name": "bulksender",
   "version": "2.0.0",
   "description": "Free, open-source WhatsApp bulk message sender with anti-ban protection, media support, and real-time delivery tracking",
-  "main": "server.js",
+  "main": "electron-main.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "desktop": "electron .",
+    "download:chrome": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-puppeteer-cache.ps1",
+    "dist:win": "npm run download:chrome && electron-builder --win nsis",
+    "pack:win": "npm run download:chrome && electron-builder --win dir"
   },
   "keywords": [
     "whatsapp",
@@ -40,5 +44,53 @@
     "systray": "^1.0.5",
     "whatsapp-web.js": "^1.26.0",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.malaviya24.bulksender",
+    "productName": "BulkSender",
+    "copyright": "Copyright © Malaviya24",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-main.js",
+      "server.js",
+      "package.json",
+      "public/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".puppeteer-cache",
+        "to": "puppeteer",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/puppeteer/**/*",
+      "node_modules/puppeteer-core/**/*",
+      "node_modules/@puppeteer/**/*",
+      "node_modules/systray/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BulkSender",
+      "artifactName": "BulkSender-Setup-${version}.${ext}"
+    }
   }
 }

@@ -66,9 +66,35 @@ Most WhatsApp bulk senders are either expensive paid tools, fragile Python scrip
 - **Your data stays yours** — No analytics, no tracking, no cloud uploads
 - **Session saved locally** — Scan QR once, stay logged in
 
+## Windows Download
+
+For normal users, download the Windows installer from GitHub Releases:
+
+1. Open the [Latest Release](https://github.com/Malaviya24/Whatsapp-Bulk-Sender/releases/latest)
+2. Download `BulkSender-Setup-2.0.0.exe`
+3. Double-click the installer
+4. Launch **BulkSender** from the Desktop or Start Menu
+
+No Node.js, npm, command prompt, or coding setup is required. The desktop installer bundles the app runtime and the browser engine needed for WhatsApp Web automation.
+
 ## 🚀 Installation
 
-### Option 1: One-Click Install (Recommended)
+### Option 1: Windows EXE Installer (Recommended)
+
+```bash
+npm install
+npm run dist:win
+```
+
+The installer will be created at:
+
+```text
+dist/BulkSender-Setup-2.0.0.exe
+```
+
+Upload this `.exe` file to a GitHub Release so users can download and install BulkSender like normal Windows software.
+
+### Option 2: One-Click Script Install
 
 1. **Download** the latest release ZIP from the [Latest Release](https://github.com/Malaviya24/Whatsapp-Bulk-Sender/releases/latest) page (or download this repo as ZIP)
 2. **Extract** the ZIP to any folder (e.g., `C:\BulkSender`)
@@ -83,7 +109,7 @@ The installer handles:
 - ✅ Adding entries to Start Menu (searchable in Windows)
 - ✅ Creating default `.env` configuration
 
-### Option 2: Manual Setup (For Developers)
+### Option 3: Manual Setup (For Developers)
 
 ```bash
 # Clone this repository
